@@ -4,7 +4,6 @@ import { ADMIN_EMAIL } from '../config/admin'
 
 const AuthContext = createContext(null)
 
-// Demo user for when Supabase is not configured
 const DEMO_USER = {
   id: 'demo-user-001',
   email: 'demo@litsurvey.app',
@@ -16,48 +15,72 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(!isDemoMode)
 
   useEffect(() => {
-    if (isDemoMode) return
+    // No Supabase client available — stay in demo mode
+    if (isDemoMode || !supabase) return
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    let subscription = null
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null)
-        if (loading) setLoading(false)
+    const init = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) {
+          console.error('[LitSurvey] getSession error:', error.message)
+        } else {
+          setUser(session?.user ?? null)
+        }
+      } catch (err) {
+        console.error('[LitSurvey] Auth init failed:', err)
+      } finally {
+        setLoading(false)
       }
-    )
+    }
 
-    return () => subscription.unsubscribe()
+    init()
+
+    try {
+      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null)
+      })
+      subscription = data?.subscription
+    } catch (err) {
+      console.error('[LitSurvey] Auth listener failed:', err)
+    }
+
+    return () => {
+      try { subscription?.unsubscribe() } catch (_) {}
+    }
   }, [])
 
   const signUp = async (email, password, fullName) => {
-    if (isDemoMode) { setUser(DEMO_USER); return { error: null } }
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName } }
-    })
-    return { error }
+    if (isDemoMode || !supabase) { setUser(DEMO_USER); return { error: null } }
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName } }
+      })
+      return { error }
+    } catch (err) {
+      return { error: { message: 'Sign up failed. Please try again.' } }
+    }
   }
 
   const signIn = async (email, password) => {
-    if (isDemoMode) { setUser(DEMO_USER); return { error: null } }
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return { error }
+    if (isDemoMode || !supabase) { setUser(DEMO_USER); return { error: null } }
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      return { error }
+    } catch (err) {
+      return { error: { message: 'Sign in failed. Please check your connection.' } }
+    }
   }
 
   const signOut = async () => {
-    if (isDemoMode) { setUser(null); return }
-    await supabase.auth.signOut()
+    if (isDemoMode || !supabase) { setUser(null); return }
+    try { await supabase.auth.signOut() } catch (_) {}
     setUser(null)
   }
 
-  // Admin check — only the configured email gets delete powers
   const isAdmin = user?.email === ADMIN_EMAIL
 
   return (
