@@ -15,7 +15,7 @@ export async function fetchArxivMetadata(url) {
 
   try {
     const response = await fetch(
-      `https://export.arxiv.org/api/query?id_list=${id}`
+      `https://api.allorigins.win/raw?url=${encodeURIComponent('https://export.arxiv.org/api/query?id_list=' + id)}`
     )
     const text = await response.text()
     const parser = new DOMParser()
