@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { supabase, isDemoMode } from '../lib/supabase'
+import { ADMIN_EMAIL } from '../config/admin'
 
 const AuthContext = createContext(null)
 
@@ -17,14 +18,17 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (isDemoMode) return
 
+    // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setLoading(false)
     })
 
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null)
+        if (loading) setLoading(false)
       }
     )
 
@@ -34,7 +38,8 @@ export function AuthProvider({ children }) {
   const signUp = async (email, password, fullName) => {
     if (isDemoMode) { setUser(DEMO_USER); return { error: null } }
     const { error } = await supabase.auth.signUp({
-      email, password,
+      email,
+      password,
       options: { data: { full_name: fullName } }
     })
     return { error }
@@ -49,10 +54,14 @@ export function AuthProvider({ children }) {
   const signOut = async () => {
     if (isDemoMode) { setUser(null); return }
     await supabase.auth.signOut()
+    setUser(null)
   }
 
+  // Admin check — only the configured email gets delete powers
+  const isAdmin = user?.email === ADMIN_EMAIL
+
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut, isDemoMode }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut, isDemoMode, isAdmin }}>
       {children}
     </AuthContext.Provider>
   )

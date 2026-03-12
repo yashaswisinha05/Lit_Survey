@@ -9,11 +9,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
 
     const result = isSignUp
@@ -21,12 +23,14 @@ export default function LoginPage() {
       : await signIn(email, password)
 
     if (result.error) {
-      setError(result.error.message)
+      setError(result.error.message || 'Invalid email or password.')
+    } else if (isSignUp) {
+      setSuccess('Account created! Check your email to confirm, then sign in.')
     }
+
     setLoading(false)
   }
 
-  // In demo mode, auto-sign in
   const handleDemoSignIn = () => {
     signIn('demo@litsurvey.app', 'demo')
   }
@@ -64,7 +68,7 @@ export default function LoginPage() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required={!isDemoMode}
+              required
             />
           </div>
           <div className="form-group">
@@ -75,7 +79,7 @@ export default function LoginPage() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required={!isDemoMode}
+              required
             />
           </div>
 
@@ -85,10 +89,15 @@ export default function LoginPage() {
         </form>
 
         {error && <div className="login-error">{error}</div>}
+        {success && (
+          <div className="login-error" style={{ background: 'rgba(16,185,129,0.08)', borderColor: '#10b981', color: '#10b981' }}>
+            {success}
+          </div>
+        )}
 
         <div className="login-toggle">
           {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-          <button onClick={() => { setIsSignUp(!isSignUp); setError('') }}>
+          <button onClick={() => { setIsSignUp(!isSignUp); setError(''); setSuccess('') }}>
             {isSignUp ? 'Sign In' : 'Sign Up'}
           </button>
         </div>

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { BookOpen, LogOut, Plus } from 'lucide-react'
 
 export default function Navbar({ onAddPaper }) {
-  const { user, signOut, isDemoMode } = useAuth()
+  const { user, signOut, isDemoMode, isAdmin } = useAuth()
 
   const displayName = user?.user_metadata?.full_name || user?.email || 'User'
   const initial = displayName.charAt(0).toUpperCase()
@@ -24,6 +24,16 @@ export default function Navbar({ onAddPaper }) {
             color: '#f59e0b',
             fontWeight: 600
           }}>DEMO</span>
+        )}
+        {isAdmin && (
+          <span style={{
+            fontSize: '0.65rem',
+            padding: '2px 8px',
+            borderRadius: 20,
+            background: 'rgba(139,92,246,0.15)',
+            color: '#8b5cf6',
+            fontWeight: 600
+          }}>ADMIN</span>
         )}
       </div>
 

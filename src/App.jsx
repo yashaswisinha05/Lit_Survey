@@ -97,7 +97,7 @@ const DEMO_PAPERS = [
 // App Component
 // ===========================================================
 export default function App() {
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, isAdmin } = useAuth()
   const [papers, setPapers] = useState(isDemoMode ? DEMO_PAPERS : [])
   const [tags, setTags] = useState(isDemoMode ? DEMO_TAGS : [])
   const [activeTag, setActiveTag] = useState(null)
@@ -344,7 +344,7 @@ export default function App() {
                   paper={paper}
                   tags={tags}
                   onTagClick={setActiveTag}
-                  onDelete={handleDeletePaper}
+                  onDelete={isAdmin ? handleDeletePaper : null}
                   showSimilarity={showSimilarity}
                 />
               ))
