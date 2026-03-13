@@ -20,8 +20,8 @@ export default function Navbar({ onAddPaper }) {
             fontSize: '0.65rem',
             padding: '2px 8px',
             borderRadius: 20,
-            background: 'rgba(245,158,11,0.15)',
-            color: '#f59e0b',
+            background: '#ffedd5',
+            color: '#c2410c',
             fontWeight: 600
           }}>DEMO</span>
         )}
@@ -30,8 +30,8 @@ export default function Navbar({ onAddPaper }) {
             fontSize: '0.65rem',
             padding: '2px 8px',
             borderRadius: 20,
-            background: 'rgba(139,92,246,0.15)',
-            color: '#8b5cf6',
+            background: '#e0e7ff',
+            color: '#4338ca',
             fontWeight: 600
           }}>ADMIN</span>
         )}

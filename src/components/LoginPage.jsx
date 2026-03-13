@@ -90,7 +90,7 @@ export default function LoginPage() {
 
         {error && <div className="login-error">{error}</div>}
         {success && (
-          <div className="login-error" style={{ background: 'rgba(16,185,129,0.08)', borderColor: '#10b981', color: '#10b981' }}>
+          <div className="login-error" style={{ background: '#dcfce7', borderColor: '#86efac', color: '#166534' }}>
             {success}
           </div>
         )}

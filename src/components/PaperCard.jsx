@@ -65,8 +65,9 @@ export default function PaperCard({ paper, tags, onTagClick, onDelete, showSimil
               key={tag.id}
               className="tag-chip"
               style={{
-                backgroundColor: tag.color + '20',
-                color: tag.color,
+                backgroundColor: tag.color + '15',
+                color: '#1e293b',
+                border: `1px solid ${tag.color}40`,
               }}
               onClick={() => onTagClick(tag.id)}
             >

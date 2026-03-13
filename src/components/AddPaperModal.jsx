@@ -124,8 +124,9 @@ export default function AddPaperModal({ tags, onClose, onSubmit }) {
                   key={tag.id}
                   className={`tag-chip ${selectedTags.includes(tag.id) ? 'selected' : ''}`}
                   style={{
-                    backgroundColor: tag.color + '20',
-                    color: tag.color,
+                    backgroundColor: tag.color + '15',
+                    color: '#1e293b', // darker text for light mode
+                    border: `1px solid ${tag.color}40`,
                   }}
                   onClick={() => toggleTag(tag.id)}
                 >
