@@ -1,3 +1,5 @@
+import { supabase } from './supabase'
+
 /**
  * Fetch paper metadata from an arXiv URL using the arXiv API.
  * Supports URLs like:
@@ -14,8 +16,9 @@ export async function fetchArxivMetadata(url) {
   if (!id) return null
 
   try {
+    // Use codetabs proxy as it reliably returns raw XML without Cloudflare 522 errors
     const response = await fetch(
-      `https://api.allorigins.win/raw?url=${encodeURIComponent('https://export.arxiv.org/api/query?id_list=' + id)}`
+      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent('https://export.arxiv.org/api/query?id_list=' + id)}`
     )
     const text = await response.text()
     const parser = new DOMParser()
@@ -32,7 +35,7 @@ export async function fetchArxivMetadata(url) {
 
     return { title, abstract, authors, source: 'arxiv' }
   } catch (err) {
-    console.error('Failed to fetch arXiv metadata:', err)
+    console.error('Failed to fetch arXiv metadata via proxy:', err)
     return null
   }
 }
